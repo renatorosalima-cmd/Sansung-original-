@@ -13,7 +13,7 @@ viewport-fit=cover">
 <meta name="theme-color"
 content="#000000">
 
-<title>Cine Manual Web V2.2</title>
+<title>Cine Manual Web V2.3</title>
 
 
 <style>
@@ -82,7 +82,133 @@ transition:transform .12s;
 
 
 /* =========================
-   BARRAS
+   ÁREA DE TOQUE
+========================= */
+
+#touchArea{
+
+position:absolute;
+
+inset:0;
+
+z-index:10;
+
+pointer-events:auto;
+
+}
+
+
+/* =========================
+   INDICADOR DE FOCO
+========================= */
+
+#focusBox{
+
+position:absolute;
+
+width:70px;
+
+height:70px;
+
+border:2px solid #fff;
+
+border-radius:4px;
+
+display:none;
+
+pointer-events:none;
+
+transform:
+translate(-50%,-50%);
+
+z-index:15;
+
+box-shadow:
+0 0 8px rgba(0,0,0,.7);
+
+}
+
+
+#focusBox.active{
+
+display:block;
+
+animation:
+focusAnimation .45s ease;
+
+}
+
+
+@keyframes focusAnimation{
+
+0%{
+
+transform:
+translate(-50%,-50%)
+scale(1.25);
+
+opacity:.4;
+
+}
+
+100%{
+
+transform:
+translate(-50%,-50%)
+scale(1);
+
+opacity:1;
+
+}
+
+}
+
+
+/* =========================
+   EXPOSIÇÃO VERTICAL
+========================= */
+
+#exposureIndicator{
+
+position:absolute;
+
+display:none;
+
+width:3px;
+
+height:100px;
+
+background:#fff;
+
+border-radius:3px;
+
+z-index:16;
+
+pointer-events:none;
+
+}
+
+
+#exposureIndicator::before{
+
+content:"☀";
+
+position:absolute;
+
+left:50%;
+
+top:-24px;
+
+transform:
+translateX(-50%);
+
+font-size:17px;
+
+}
+
+
+/* =========================
+   TOPO
 ========================= */
 
 #topBar,
@@ -106,7 +232,8 @@ flex-wrap:wrap;
 
 gap:6px;
 
-background:rgba(0,0,0,.65);
+background:
+rgba(0,0,0,.65);
 
 padding:7px;
 
@@ -118,7 +245,10 @@ padding:7px;
 top:0;
 
 padding-top:
-calc(7px + env(safe-area-inset-top));
+calc(
+7px +
+env(safe-area-inset-top)
+);
 
 }
 
@@ -128,7 +258,10 @@ calc(7px + env(safe-area-inset-top));
 bottom:0;
 
 padding-bottom:
-calc(7px + env(safe-area-inset-bottom));
+calc(
+7px +
+env(safe-area-inset-bottom)
+);
 
 }
 
@@ -142,7 +275,7 @@ select{
 
 background:#151515;
 
-color:white;
+color:#fff;
 
 border:1px solid #666;
 
@@ -362,7 +495,7 @@ pointer-events:none;
 
 position:absolute;
 
-z-index:30;
+z-index:40;
 
 left:50%;
 
@@ -393,7 +526,7 @@ max-width:90%;
 
 position:absolute;
 
-z-index:25;
+z-index:35;
 
 left:50%;
 
@@ -402,10 +535,13 @@ top:50%;
 transform:
 translate(-50%,-50%);
 
-width:min(360px,90vw);
+width:min(
+360px,
+90vw
+);
 
 background:
-rgba(0,0,0,.88);
+rgba(0,0,0,.90);
 
 border:
 1px solid #666;
@@ -476,6 +612,39 @@ line-height:1.4;
 
 
 /* =========================
+   DICA
+========================= */
+
+#touchHint{
+
+position:absolute;
+
+z-index:30;
+
+left:50%;
+
+bottom:105px;
+
+transform:
+translateX(-50%);
+
+background:
+rgba(0,0,0,.55);
+
+padding:6px 10px;
+
+border-radius:8px;
+
+font-size:10px;
+
+display:none;
+
+pointer-events:none;
+
+}
+
+
+/* =========================
    MOBILE
 ========================= */
 
@@ -509,9 +678,7 @@ width:105px;
 <div id="app">
 
 
-<!-- =========================
-     CÂMERA
-========================= -->
+<!-- CÂMERA -->
 
 <video
 
@@ -526,9 +693,25 @@ muted>
 </video>
 
 
-<!-- =========================
-     GRADE
-========================= -->
+<!-- ÁREA DE TOQUE -->
+
+<div id="touchArea">
+</div>
+
+
+<!-- INDICADOR DE FOCO -->
+
+<div id="focusBox">
+</div>
+
+
+<!-- INDICADOR DE EXPOSIÇÃO -->
+
+<div id="exposureIndicator">
+</div>
+
+
+<!-- GRADE -->
 
 <div id="guides">
 
@@ -543,9 +726,7 @@ muted>
 </div>
 
 
-<!-- =========================
-     CINEMA
-========================= -->
+<!-- CINEMA -->
 
 <div
 id="topLetter"
@@ -558,9 +739,7 @@ class="letter">
 </div>
 
 
-<!-- =========================
-     PAINEL MANUAL
-========================= -->
+<!-- PAINEL MANUAL -->
 
 <div id="manualPanel">
 
@@ -660,8 +839,11 @@ Não disponível
 
 <div class="manualInfo">
 
-Os controles dependem do suporte
-do navegador e da câmera do celular.
+Toque na tela para tentar focar.
+<br>
+
+Arraste verticalmente para ajustar
+a exposição quando suportado.
 
 </div>
 
@@ -669,9 +851,16 @@ do navegador e da câmera do celular.
 </div>
 
 
-<!-- =========================
-     TOPO
-========================= -->
+<!-- DICA -->
+
+<div id="touchHint">
+
+Toque para focar • Arraste ↑↓ para exposição
+
+</div>
+
+
+<!-- TOPO -->
 
 <div id="topBar">
 
@@ -795,9 +984,7 @@ Cinema 2.35:1
 </div>
 
 
-<!-- =========================
-     RODAPÉ
-========================= -->
+<!-- RODAPÉ -->
 
 <div id="bottomBar">
 
@@ -874,9 +1061,7 @@ Aguardando câmera
 </div>
 
 
-<!-- =========================
-     MENSAGEM
-========================= -->
+<!-- MENSAGEM -->
 
 <div id="message">
 
@@ -919,9 +1104,22 @@ let recordingStart = 0;
 let timerInterval = null;
 
 
+/* TOQUE */
+
+let touchStartX = 0;
+
+let touchStartY = 0;
+
+let touchStartTime = 0;
+
+let touchStartExposure = 0;
+
+let draggingExposure = false;
+
+
 
 /* =========================
-   ATALHO
+   $
 ========================= */
 
 function $(id){
@@ -986,7 +1184,7 @@ videoTrack = null;
 
 
 /* =========================
-   CONFIGURAÇÃO
+   CONSTRAINTS
 ========================= */
 
 function createConstraints(){
@@ -1017,23 +1215,17 @@ resolution !== "auto"
 let parts =
 resolution.split("x");
 
-let width =
-Number(parts[0]);
-
-let height =
-Number(parts[1]);
-
 
 video.width = {
 
-ideal:width
+ideal:Number(parts[0])
 
 };
 
 
 video.height = {
 
-ideal:height
+ideal:Number(parts[1])
 
 };
 
@@ -1112,6 +1304,11 @@ videoTrack.getCapabilities()
 configureControls();
 
 
+$("zoom").value = 1;
+
+applyZoom();
+
+
 const settings =
 videoTrack.getSettings();
 
@@ -1135,14 +1332,29 @@ settings.frameRate || 0
 );
 
 
-$("zoom").value = 1;
-
-applyZoom();
-
 updateCinema();
 
 
 showMessage("");
+
+
+/* DICA */
+
+$("touchHint").style.display =
+"block";
+
+
+setTimeout(
+function(){
+
+$("touchHint")
+.style
+.display =
+"none";
+
+},
+3500
+);
 
 
 }
@@ -1181,7 +1393,7 @@ error.name ||
 
 
 /* =========================
-   CONFIGURAR CONTROLES
+   CAPACIDADES
 ========================= */
 
 function configureControls(){
@@ -1249,6 +1461,9 @@ exposure.max;
 
 $("exposure").step =
 exposure.step || .1;
+
+
+$("exposure").value = 0;
 
 }
 
@@ -1334,7 +1549,9 @@ mode;
 
 
 $("focusMode")
-.appendChild(option);
+.appendChild(
+option
+);
 
 }
 
@@ -1349,12 +1566,7 @@ true;
 
 
 $("focusMode").innerHTML =
-
-"<option>" +
-
-"Não disponível" +
-
-"</option>";
+"<option>Não disponível</option>";
 
 }
 
@@ -1394,32 +1606,8 @@ option.value =
 mode;
 
 
-if(
-mode ===
-"continuous"
-){
-
-option.textContent =
-"Contínuo";
-
-}
-
-else if(
-mode ===
-"manual"
-){
-
-option.textContent =
-"Manual";
-
-}
-
-else{
-
 option.textContent =
 mode;
-
-}
 
 
 $("whiteBalance")
@@ -1440,12 +1628,7 @@ true;
 
 
 $("whiteBalance").innerHTML =
-
-"<option>" +
-
-"Não disponível" +
-
-"</option>";
+"<option>Não disponível</option>";
 
 }
 
@@ -1507,16 +1690,12 @@ return;
 
 catch(error){
 
-console.log(
-"Zoom real indisponível"
-);
+console.log(error);
 
 }
 
 }
 
-
-/* ZOOM VISUAL */
 
 $("preview")
 .style
@@ -1590,7 +1769,7 @@ Object.keys(settings).length === 0
 ){
 
 setStatus(
-"Controles manuais não disponíveis"
+"Controle manual não disponível"
 );
 
 return;
@@ -1625,12 +1804,407 @@ console.log(error);
 
 
 setStatus(
-"Controle não suportado pela câmera"
+"Controle não suportado"
 );
 
 }
 
 }
+
+
+
+/* =========================
+   FOCO POR TOQUE
+========================= */
+
+async function focusAtPoint(
+x,
+y
+){
+
+
+/*
+A API padrão do navegador
+não possui um comando universal
+de foco por coordenada.
+
+Aqui usamos o modo de foco
+disponível como melhor aproximação.
+*/
+
+
+if(
+videoTrack
+&&
+!$("focusMode").disabled
+){
+
+
+let modes =
+capabilities.focusMode || [];
+
+
+try{
+
+
+if(
+modes.includes(
+"single-shot"
+)
+){
+
+await videoTrack
+.applyConstraints({
+
+advanced:[
+{
+focusMode:
+"single-shot"
+}
+]
+
+});
+
+
+setStatus(
+"Foco por toque"
+);
+
+}
+
+else if(
+modes.includes(
+"continuous"
+)
+){
+
+await videoTrack
+.applyConstraints({
+
+advanced:[
+{
+focusMode:
+"continuous"
+}
+]
+
+});
+
+
+setStatus(
+"Foco contínuo"
+);
+
+}
+
+else{
+
+setStatus(
+"Foco manual não disponível"
+);
+
+}
+
+
+}
+
+catch(error){
+
+setStatus(
+"Foco não suportado"
+);
+
+}
+
+}
+
+else{
+
+setStatus(
+"Foco por toque não disponível"
+);
+
+}
+
+}
+
+
+
+/* =========================
+   INDICADOR
+========================= */
+
+function showFocusBox(
+x,
+y
+){
+
+
+let box =
+$("focusBox");
+
+
+box.style.left =
+x + "px";
+
+
+box.style.top =
+y + "px";
+
+
+box.classList.remove(
+"active"
+);
+
+
+/* força nova animação */
+
+void box.offsetWidth;
+
+
+box.classList.add(
+"active"
+);
+
+
+setTimeout(
+function(){
+
+box.classList.remove(
+"active"
+);
+
+},
+900
+);
+
+}
+
+
+
+/* =========================
+   TOQUE
+========================= */
+
+$("touchArea")
+.addEventListener(
+"pointerdown",
+function(event){
+
+
+if(
+!videoTrack
+){
+
+return;
+
+}
+
+
+/*
+Não interceptar controles
+da interface.
+*/
+
+if(
+event.target !==
+$("touchArea")
+){
+
+return;
+
+}
+
+
+touchStartX =
+event.clientX;
+
+
+touchStartY =
+event.clientY;
+
+
+touchStartTime =
+Date.now();
+
+
+touchStartExposure =
+Number(
+$("exposure").value
+);
+
+
+draggingExposure = false;
+
+});
+
+
+
+$("touchArea")
+.addEventListener(
+"pointermove",
+function(event){
+
+
+if(
+!videoTrack
+){
+
+return;
+
+}
+
+
+let dy =
+event.clientY
+-
+touchStartY;
+
+
+if(
+Math.abs(dy) > 12
+){
+
+draggingExposure = true;
+
+
+/*
+Arrastar para cima
+aumenta exposição.
+
+Arrastar para baixo
+diminui.
+*/
+
+
+let range =
+Number(
+$("exposure").max
+)
+-
+Number(
+$("exposure").min
+);
+
+
+let sensitivity =
+range /
+250;
+
+
+let value =
+
+touchStartExposure
+-
+(dy * sensitivity);
+
+
+value =
+Math.max(
+Number(
+$("exposure").min
+),
+Math.min(
+Number(
+$("exposure").max
+),
+value
+)
+;
+
+
+if(
+!$("exposure").disabled
+){
+
+$("exposure").value =
+value;
+
+
+$("exposureValue")
+.textContent =
+value.toFixed(1);
+
+
+applyManualControls();
+
+
+$("exposureIndicator")
+.style
+.display =
+"block";
+
+
+$("exposureIndicator")
+.style
+.left =
+event.clientX + "px";
+
+
+$("exposureIndicator")
+.style
+.top =
+event.clientY + "px";
+
+}
+
+}
+
+});
+
+
+
+$("touchArea")
+.addEventListener(
+"pointerup",
+function(event){
+
+
+if(
+!videoTrack
+){
+
+return;
+
+}
+
+
+/*
+Se não arrastou,
+é um toque para foco.
+*/
+
+if(
+!draggingExposure
+){
+
+focusAtPoint(
+event.clientX,
+event.clientY
+);
+
+
+showFocusBox(
+event.clientX,
+event.clientY
+);
+
+}
+
+
+setTimeout(
+function(){
+
+$("exposureIndicator")
+.style
+.display =
+"none";
+
+},
+700
+);
+
+});
 
 
 
@@ -1641,6 +2215,7 @@ setStatus(
 $("openCamera")
 .onclick =
 openCamera;
+
 
 
 $("flipCamera")
@@ -1693,6 +2268,7 @@ applyManualControls();
 $("focusMode")
 .onchange =
 applyManualControls;
+
 
 
 $("whiteBalance")
@@ -1793,7 +2369,8 @@ $("bottomLetter");
 
 
 if(
-mode === "normal"
+mode ===
+"normal"
 ){
 
 top.style.display =
@@ -1881,7 +2458,7 @@ updateCinema
 
 
 /* =========================
-   FORMATO DE VÍDEO
+   GRAVAÇÃO
 ========================= */
 
 function getMimeType(){
@@ -1907,7 +2484,9 @@ of formats
 
 if(
 MediaRecorder
-.isTypeSupported(format)
+.isTypeSupported(
+format
+)
 ){
 
 return format;
@@ -1924,7 +2503,7 @@ return "";
 
 
 /* =========================
-   GRAVAÇÃO
+   REC
 ========================= */
 
 $("recordButton")
@@ -2006,7 +2585,6 @@ stream
 );
 
 }
-
 
 
 recordedChunks = [];
@@ -2116,6 +2694,7 @@ String(minutes)
 )
 
 +
+
 ":"
 
 +
@@ -2191,10 +2770,15 @@ recorder.mimeType
 
 let blob =
 new Blob(
+
 recordedChunks,
+
 {
+
 type:type
+
 }
+
 );
 
 
@@ -2217,7 +2801,9 @@ url;
 link.download =
 
 "CINE_"
+
 +
+
 new Date()
 .toISOString()
 .replace(
@@ -2228,6 +2814,7 @@ new Date()
 +
 
 "."
+
 +
 
 (
