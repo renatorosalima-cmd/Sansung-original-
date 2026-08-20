@@ -1,0 +1,2275 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+
+<meta charset="UTF-8">
+
+<meta name="viewport"
+content="width=device-width,
+initial-scale=1,
+viewport-fit=cover">
+
+<meta name="theme-color"
+content="#000000">
+
+<title>Cine Manual Web V2.2</title>
+
+
+<style>
+
+*{
+box-sizing:border-box;
+}
+
+html,
+body{
+
+margin:0;
+padding:0;
+
+width:100%;
+height:100%;
+
+background:#000;
+
+overflow:hidden;
+
+font-family:Arial,sans-serif;
+
+color:white;
+
+}
+
+
+#app{
+
+position:fixed;
+
+inset:0;
+
+background:#000;
+
+overflow:hidden;
+
+}
+
+
+/* =========================
+   CÂMERA
+========================= */
+
+#preview{
+
+position:absolute;
+
+inset:0;
+
+width:100%;
+height:100%;
+
+object-fit:cover;
+
+object-position:center;
+
+background:#000;
+
+transform-origin:center;
+
+transition:transform .12s;
+
+}
+
+
+/* =========================
+   BARRAS
+========================= */
+
+#topBar,
+#bottomBar{
+
+position:absolute;
+
+left:0;
+
+width:100%;
+
+z-index:20;
+
+display:flex;
+
+align-items:center;
+
+justify-content:center;
+
+flex-wrap:wrap;
+
+gap:6px;
+
+background:rgba(0,0,0,.65);
+
+padding:7px;
+
+}
+
+
+#topBar{
+
+top:0;
+
+padding-top:
+calc(7px + env(safe-area-inset-top));
+
+}
+
+
+#bottomBar{
+
+bottom:0;
+
+padding-bottom:
+calc(7px + env(safe-area-inset-bottom));
+
+}
+
+
+/* =========================
+   BOTÕES
+========================= */
+
+button,
+select{
+
+background:#151515;
+
+color:white;
+
+border:1px solid #666;
+
+border-radius:8px;
+
+padding:7px 9px;
+
+font-size:12px;
+
+}
+
+
+button:active{
+
+transform:scale(.96);
+
+}
+
+
+.rec{
+
+border-color:#b00000;
+
+}
+
+
+/* =========================
+   ZOOM
+========================= */
+
+#zoom{
+
+width:110px;
+
+}
+
+
+.value{
+
+min-width:45px;
+
+text-align:center;
+
+font-size:12px;
+
+}
+
+
+/* =========================
+   REC
+========================= */
+
+#recDot{
+
+display:inline-block;
+
+width:10px;
+
+height:10px;
+
+border-radius:50%;
+
+background:#777;
+
+margin-right:5px;
+
+}
+
+
+.recording #recDot{
+
+background:red;
+
+box-shadow:
+0 0 12px red;
+
+}
+
+
+#timer{
+
+min-width:55px;
+
+text-align:center;
+
+font-weight:bold;
+
+font-size:12px;
+
+}
+
+
+/* =========================
+   STATUS
+========================= */
+
+#status{
+
+width:100%;
+
+text-align:center;
+
+font-size:10px;
+
+color:#ddd;
+
+}
+
+
+/* =========================
+   GRADE
+========================= */
+
+#guides{
+
+position:absolute;
+
+inset:0;
+
+z-index:5;
+
+pointer-events:none;
+
+}
+
+
+.guide{
+
+position:absolute;
+
+background:
+rgba(255,255,255,.35);
+
+}
+
+
+.v1{
+
+left:33.333%;
+
+top:0;
+
+width:1px;
+
+height:100%;
+
+}
+
+
+.v2{
+
+left:66.666%;
+
+top:0;
+
+width:1px;
+
+height:100%;
+
+}
+
+
+.h1{
+
+top:33.333%;
+
+left:0;
+
+height:1px;
+
+width:100%;
+
+}
+
+
+.h2{
+
+top:66.666%;
+
+left:0;
+
+height:1px;
+
+width:100%;
+
+}
+
+
+/* =========================
+   CINEMA
+========================= */
+
+.letter{
+
+position:absolute;
+
+left:0;
+
+width:100%;
+
+background:#000;
+
+z-index:8;
+
+display:none;
+
+pointer-events:none;
+
+}
+
+
+/* =========================
+   MENSAGEM
+========================= */
+
+#message{
+
+position:absolute;
+
+z-index:30;
+
+left:50%;
+
+top:50%;
+
+transform:
+translate(-50%,-50%);
+
+background:
+rgba(0,0,0,.65);
+
+padding:15px 20px;
+
+border-radius:10px;
+
+text-align:center;
+
+max-width:90%;
+
+}
+
+
+/* =========================
+   PAINEL MANUAL
+========================= */
+
+#manualPanel{
+
+position:absolute;
+
+z-index:25;
+
+left:50%;
+
+top:50%;
+
+transform:
+translate(-50%,-50%);
+
+width:min(360px,90vw);
+
+background:
+rgba(0,0,0,.88);
+
+border:
+1px solid #666;
+
+border-radius:12px;
+
+padding:14px;
+
+display:none;
+
+}
+
+
+#manualPanel h3{
+
+margin:0 0 12px;
+
+text-align:center;
+
+font-size:15px;
+
+}
+
+
+.control{
+
+display:flex;
+
+align-items:center;
+
+gap:8px;
+
+margin:10px 0;
+
+}
+
+
+.control label{
+
+width:90px;
+
+font-size:12px;
+
+}
+
+
+.control input,
+.control select{
+
+flex:1;
+
+}
+
+
+.manualInfo{
+
+font-size:10px;
+
+color:#aaa;
+
+text-align:center;
+
+margin-top:10px;
+
+line-height:1.4;
+
+}
+
+
+/* =========================
+   MOBILE
+========================= */
+
+@media(max-width:600px){
+
+button,
+select{
+
+font-size:12px;
+
+padding:7px 8px;
+
+}
+
+#zoom{
+
+width:105px;
+
+}
+
+}
+
+</style>
+
+</head>
+
+
+<body>
+
+
+<div id="app">
+
+
+<!-- =========================
+     CÂMERA
+========================= -->
+
+<video
+
+id="preview"
+
+autoplay
+
+playsinline
+
+muted>
+
+</video>
+
+
+<!-- =========================
+     GRADE
+========================= -->
+
+<div id="guides">
+
+<div class="guide v1"></div>
+
+<div class="guide v2"></div>
+
+<div class="guide h1"></div>
+
+<div class="guide h2"></div>
+
+</div>
+
+
+<!-- =========================
+     CINEMA
+========================= -->
+
+<div
+id="topLetter"
+class="letter">
+</div>
+
+<div
+id="bottomLetter"
+class="letter">
+</div>
+
+
+<!-- =========================
+     PAINEL MANUAL
+========================= -->
+
+<div id="manualPanel">
+
+
+<h3>
+
+🎛️ CONTROLES MANUAIS
+
+</h3>
+
+
+<div class="control">
+
+<label>
+
+☀ Exposição
+
+</label>
+
+
+<input
+
+id="exposure"
+
+type="range"
+
+min="-2"
+
+max="2"
+
+step="0.1"
+
+value="0"
+
+
+disabled>
+
+
+<span
+id="exposureValue"
+class="value">
+
+0.0
+
+</span>
+
+</div>
+
+
+<div class="control">
+
+<label>
+
+🎯 Foco
+
+</label>
+
+
+<select
+id="focusMode"
+disabled>
+
+<option>
+
+Não disponível
+
+</option>
+
+</select>
+
+</div>
+
+
+<div class="control">
+
+<label>
+
+🌡️ WB
+
+</label>
+
+
+<select
+id="whiteBalance"
+disabled>
+
+<option>
+
+Não disponível
+
+</option>
+
+</select>
+
+</div>
+
+
+<div class="manualInfo">
+
+Os controles dependem do suporte
+do navegador e da câmera do celular.
+
+</div>
+
+
+</div>
+
+
+<!-- =========================
+     TOPO
+========================= -->
+
+<div id="topBar">
+
+
+<button id="openCamera">
+
+📷 Abrir câmera
+
+</button>
+
+
+<button id="flipCamera">
+
+🔄 Trocar
+
+</button>
+
+
+<select id="resolution">
+
+
+<option value="auto">
+
+Auto
+
+</option>
+
+
+<option value="1920x1080">
+
+1080p
+
+</option>
+
+
+<option value="1280x720">
+
+720p
+
+</option>
+
+
+<option value="3840x2160">
+
+4K
+
+</option>
+
+
+</select>
+
+
+<select id="fps">
+
+
+<option value="auto">
+
+FPS Auto
+
+</option>
+
+
+<option value="24">
+
+24 FPS
+
+</option>
+
+
+<option value="25">
+
+25 FPS
+
+</option>
+
+
+<option value="30">
+
+30 FPS
+
+</option>
+
+
+<option value="60">
+
+60 FPS
+
+</option>
+
+
+</select>
+
+
+<select id="aspect">
+
+
+<option value="normal">
+
+Normal
+
+</option>
+
+
+<option value="2.39">
+
+Cinema 2.39:1
+
+</option>
+
+
+<option value="2.35">
+
+Cinema 2.35:1
+
+</option>
+
+
+</select>
+
+
+</div>
+
+
+<!-- =========================
+     RODAPÉ
+========================= -->
+
+<div id="bottomBar">
+
+
+<button id="manualButton">
+
+🎛️ Manual
+
+</button>
+
+
+<button id="gridButton">
+
+Grade ON
+
+</button>
+
+
+<input
+
+id="zoom"
+
+type="range"
+
+min="1"
+
+max="4"
+
+step="0.1"
+
+value="1">
+
+
+<span
+id="zoomValue"
+class="value">
+
+1.0×
+
+</span>
+
+
+<button
+id="recordButton"
+class="rec">
+
+
+<span id="recDot"></span>
+
+<span id="recordText">
+
+REC
+
+</span>
+
+
+</button>
+
+
+<span id="timer">
+
+00:00
+
+</span>
+
+
+<div id="status">
+
+Aguardando câmera
+
+</div>
+
+
+</div>
+
+
+<!-- =========================
+     MENSAGEM
+========================= -->
+
+<div id="message">
+
+Toque em
+<b>Abrir câmera</b>
+
+</div>
+
+
+</div>
+
+
+
+<script>
+
+
+/* =========================
+   VARIÁVEIS
+========================= */
+
+let stream = null;
+
+let videoTrack = null;
+
+let capabilities = {};
+
+let facingMode =
+"environment";
+
+let realZoom = false;
+
+let recorder = null;
+
+let recordedChunks = [];
+
+let recording = false;
+
+let recordingStart = 0;
+
+let timerInterval = null;
+
+
+
+/* =========================
+   ATALHO
+========================= */
+
+function $(id){
+
+return document.getElementById(id);
+
+}
+
+
+
+/* =========================
+   MENSAGEM
+========================= */
+
+function showMessage(text){
+
+$("message").innerHTML =
+text;
+
+$("message").style.display =
+text ? "block" : "none";
+
+}
+
+
+
+/* =========================
+   STATUS
+========================= */
+
+function setStatus(text){
+
+$("status").textContent =
+text;
+
+}
+
+
+
+/* =========================
+   PARAR CÂMERA
+========================= */
+
+function stopCamera(){
+
+if(stream){
+
+stream
+.getTracks()
+.forEach(
+track => track.stop()
+);
+
+stream = null;
+
+videoTrack = null;
+
+}
+
+}
+
+
+
+/* =========================
+   CONFIGURAÇÃO
+========================= */
+
+function createConstraints(){
+
+
+let video = {
+
+facingMode:{
+ideal:facingMode
+}
+
+};
+
+
+let resolution =
+$("resolution").value;
+
+
+let fps =
+$("fps").value;
+
+
+
+if(
+resolution !== "auto"
+){
+
+let parts =
+resolution.split("x");
+
+let width =
+Number(parts[0]);
+
+let height =
+Number(parts[1]);
+
+
+video.width = {
+
+ideal:width
+
+};
+
+
+video.height = {
+
+ideal:height
+
+};
+
+}
+
+
+
+if(
+fps !== "auto"
+){
+
+video.frameRate = {
+
+ideal:Number(fps),
+
+max:Number(fps)
+
+};
+
+}
+
+
+return {
+
+audio:true,
+
+video:video
+
+};
+
+}
+
+
+
+/* =========================
+   ABRIR CÂMERA
+========================= */
+
+async function openCamera(){
+
+stopCamera();
+
+
+try{
+
+
+stream =
+await navigator
+.mediaDevices
+.getUserMedia(
+createConstraints()
+);
+
+
+$("preview").srcObject =
+stream;
+
+
+await $("preview").play();
+
+
+videoTrack =
+stream
+.getVideoTracks()[0];
+
+
+capabilities =
+videoTrack
+.getCapabilities
+?
+videoTrack.getCapabilities()
+:
+{};
+
+
+configureControls();
+
+
+const settings =
+videoTrack.getSettings();
+
+
+setStatus(
+
+(settings.width || "?")
++
+" × "
++
+(settings.height || "?")
++
+" • "
++
+Math.round(
+settings.frameRate || 0
+)
++
+" FPS"
+
+);
+
+
+$("zoom").value = 1;
+
+applyZoom();
+
+updateCinema();
+
+
+showMessage("");
+
+
+}
+
+catch(error){
+
+console.error(error);
+
+
+showMessage(
+
+"Não foi possível abrir a câmera.<br><br>" +
+
+"<small>" +
+
+"Verifique a permissão da câmera " +
+
+"e se o site está usando HTTPS."
+
++
+
+"</small>"
+
+);
+
+
+setStatus(
+error.name ||
+"Erro"
+);
+
+}
+
+}
+
+
+
+/* =========================
+   CONFIGURAR CONTROLES
+========================= */
+
+function configureControls(){
+
+
+/* ZOOM */
+
+if(
+capabilities.zoom
+){
+
+realZoom = true;
+
+
+$("zoom").min =
+capabilities.zoom.min || 1;
+
+
+$("zoom").max =
+Math.min(
+capabilities.zoom.max || 4,
+8
+);
+
+
+$("zoom").step =
+capabilities.zoom.step || .1;
+
+}
+
+else{
+
+realZoom = false;
+
+
+$("zoom").min = 1;
+
+$("zoom").max = 4;
+
+$("zoom").step = .1;
+
+}
+
+
+
+/* EXPOSIÇÃO */
+
+let exposure =
+capabilities.exposureCompensation;
+
+
+if(exposure){
+
+$("exposure").disabled =
+false;
+
+
+$("exposure").min =
+exposure.min;
+
+
+$("exposure").max =
+exposure.max;
+
+
+$("exposure").step =
+exposure.step || .1;
+
+}
+
+else{
+
+$("exposure").disabled =
+true;
+
+}
+
+
+
+/* FOCO */
+
+let focusModes =
+capabilities.focusMode;
+
+
+$("focusMode").innerHTML =
+"";
+
+
+if(
+Array.isArray(focusModes)
+&&
+focusModes.length
+){
+
+$("focusMode").disabled =
+false;
+
+
+focusModes.forEach(
+mode => {
+
+
+let option =
+document.createElement(
+"option"
+);
+
+
+option.value =
+mode;
+
+
+if(
+mode ===
+"continuous"
+){
+
+option.textContent =
+"Contínuo";
+
+}
+
+else if(
+mode ===
+"single-shot"
+){
+
+option.textContent =
+"Toque";
+
+}
+
+else if(
+mode ===
+"manual"
+){
+
+option.textContent =
+"Manual";
+
+}
+
+else{
+
+option.textContent =
+mode;
+
+}
+
+
+$("focusMode")
+.appendChild(option);
+
+}
+
+);
+
+}
+
+else{
+
+$("focusMode").disabled =
+true;
+
+
+$("focusMode").innerHTML =
+
+"<option>" +
+
+"Não disponível" +
+
+"</option>";
+
+}
+
+
+
+/* WHITE BALANCE */
+
+let wb =
+capabilities.whiteBalanceMode;
+
+
+$("whiteBalance").innerHTML =
+"";
+
+
+if(
+Array.isArray(wb)
+&&
+wb.length
+){
+
+$("whiteBalance").disabled =
+false;
+
+
+wb.forEach(
+mode => {
+
+
+let option =
+document.createElement(
+"option"
+);
+
+
+option.value =
+mode;
+
+
+if(
+mode ===
+"continuous"
+){
+
+option.textContent =
+"Contínuo";
+
+}
+
+else if(
+mode ===
+"manual"
+){
+
+option.textContent =
+"Manual";
+
+}
+
+else{
+
+option.textContent =
+mode;
+
+}
+
+
+$("whiteBalance")
+.appendChild(
+option
+);
+
+}
+
+);
+
+}
+
+else{
+
+$("whiteBalance").disabled =
+true;
+
+
+$("whiteBalance").innerHTML =
+
+"<option>" +
+
+"Não disponível" +
+
+"</option>";
+
+}
+
+}
+
+
+
+/* =========================
+   ZOOM
+========================= */
+
+async function applyZoom(){
+
+
+let value =
+Number(
+$("zoom").value
+);
+
+
+$("zoomValue").textContent =
+
+value.toFixed(1)
++
+"×";
+
+
+if(
+videoTrack
+&&
+realZoom
+){
+
+try{
+
+
+await videoTrack
+.applyConstraints({
+
+advanced:[
+{
+zoom:value
+}
+]
+
+});
+
+
+$("preview")
+.style
+.transform =
+"scale(1)";
+
+
+return;
+
+
+}
+
+catch(error){
+
+console.log(
+"Zoom real indisponível"
+);
+
+}
+
+}
+
+
+/* ZOOM VISUAL */
+
+$("preview")
+.style
+.transform =
+
+"scale("
++
+value
++
+")";
+
+}
+
+
+
+/* =========================
+   CONTROLES MANUAIS
+========================= */
+
+async function applyManualControls(){
+
+
+if(!videoTrack){
+
+return;
+
+}
+
+
+let settings = {};
+
+
+
+if(
+!$("exposure").disabled
+){
+
+settings.exposureCompensation =
+Number(
+$("exposure").value
+);
+
+}
+
+
+
+if(
+!$("focusMode").disabled
+){
+
+settings.focusMode =
+$("focusMode").value;
+
+}
+
+
+
+if(
+!$("whiteBalance").disabled
+){
+
+settings.whiteBalanceMode =
+$("whiteBalance").value;
+
+}
+
+
+
+if(
+Object.keys(settings).length === 0
+){
+
+setStatus(
+"Controles manuais não disponíveis"
+);
+
+return;
+
+}
+
+
+
+try{
+
+
+await videoTrack
+.applyConstraints({
+
+advanced:[
+settings
+]
+
+});
+
+
+setStatus(
+"Controle aplicado"
+);
+
+
+}
+
+catch(error){
+
+console.log(error);
+
+
+setStatus(
+"Controle não suportado pela câmera"
+);
+
+}
+
+}
+
+
+
+/* =========================
+   BOTÕES
+========================= */
+
+$("openCamera")
+.onclick =
+openCamera;
+
+
+$("flipCamera")
+.onclick =
+function(){
+
+facingMode =
+facingMode ===
+"environment"
+
+?
+
+"user"
+
+:
+
+"environment";
+
+
+openCamera();
+
+};
+
+
+
+$("zoom")
+.oninput =
+applyZoom;
+
+
+
+$("exposure")
+.oninput =
+function(){
+
+$("exposureValue")
+.textContent =
+Number(
+$("exposure").value
+)
+.toFixed(1);
+
+
+applyManualControls();
+
+};
+
+
+
+$("focusMode")
+.onchange =
+applyManualControls;
+
+
+$("whiteBalance")
+.onchange =
+applyManualControls;
+
+
+
+/* =========================
+   PAINEL MANUAL
+========================= */
+
+$("manualButton")
+.onclick =
+function(){
+
+let panel =
+$("manualPanel");
+
+
+let visible =
+panel.style.display ===
+"block";
+
+
+panel.style.display =
+visible
+?
+"none"
+:
+"block";
+
+
+this.textContent =
+visible
+?
+"🎛️ Manual"
+:
+"🎛️ Fechar";
+
+};
+
+
+
+/* =========================
+   GRADE
+========================= */
+
+$("gridButton")
+.onclick =
+function(){
+
+let guides =
+$("guides");
+
+
+let visible =
+guides.style.display !==
+"none";
+
+
+guides.style.display =
+visible
+?
+"none"
+:
+"block";
+
+
+this.textContent =
+visible
+?
+"Grade OFF"
+:
+"Grade ON";
+
+};
+
+
+
+/* =========================
+   CINEMA
+========================= */
+
+function updateCinema(){
+
+
+let mode =
+$("aspect").value;
+
+
+let top =
+$("topLetter");
+
+
+let bottom =
+$("bottomLetter");
+
+
+if(
+mode === "normal"
+){
+
+top.style.display =
+"none";
+
+bottom.style.display =
+"none";
+
+return;
+
+}
+
+
+let ratio =
+Number(mode);
+
+
+let desiredHeight =
+window.innerWidth /
+ratio;
+
+
+let bars =
+
+(
+window.innerHeight
+-
+desiredHeight
+) / 2;
+
+
+if(
+bars > 0
+){
+
+top.style.display =
+"block";
+
+bottom.style.display =
+"block";
+
+
+top.style.height =
+bars + "px";
+
+
+bottom.style.height =
+bars + "px";
+
+
+top.style.top =
+"0";
+
+
+bottom.style.bottom =
+"0";
+
+}
+
+else{
+
+top.style.display =
+"none";
+
+bottom.style.display =
+"none";
+
+}
+
+}
+
+
+
+$("aspect")
+.onchange =
+updateCinema;
+
+
+window
+.addEventListener(
+"resize",
+updateCinema
+);
+
+
+
+/* =========================
+   FORMATO DE VÍDEO
+========================= */
+
+function getMimeType(){
+
+
+let formats = [
+
+"video/mp4;codecs=avc1.42E01E,mp4a.40.2",
+
+"video/mp4",
+
+"video/webm;codecs=vp9,opus",
+
+"video/webm"
+
+];
+
+
+for(
+let format
+of formats
+){
+
+if(
+MediaRecorder
+.isTypeSupported(format)
+){
+
+return format;
+
+}
+
+}
+
+
+return "";
+
+}
+
+
+
+/* =========================
+   GRAVAÇÃO
+========================= */
+
+$("recordButton")
+.onclick =
+function(){
+
+if(!stream){
+
+showMessage(
+"Primeiro abra a câmera."
+);
+
+return;
+
+}
+
+
+if(recording){
+
+stopRecording();
+
+}
+
+else{
+
+startRecording();
+
+}
+
+};
+
+
+
+function startRecording(){
+
+
+let mime =
+getMimeType();
+
+
+if(!mime){
+
+showMessage(
+"Formato de gravação não suportado."
+);
+
+return;
+
+}
+
+
+try{
+
+
+recorder =
+new MediaRecorder(
+
+stream,
+
+{
+
+mimeType:mime,
+
+videoBitsPerSecond:
+20000000
+
+}
+
+);
+
+
+}
+
+catch(error){
+
+recorder =
+new MediaRecorder(
+stream
+);
+
+}
+
+
+
+recordedChunks = [];
+
+
+recorder
+.ondataavailable =
+function(event){
+
+if(
+event.data.size
+){
+
+recordedChunks
+.push(
+event.data
+);
+
+}
+
+};
+
+
+
+recorder
+.onstop =
+saveRecording;
+
+
+recorder.start(1000);
+
+
+recording = true;
+
+
+document.body
+.classList
+.add(
+"recording"
+);
+
+
+$("recordText")
+.textContent =
+"PARAR";
+
+
+recordingStart =
+Date.now();
+
+
+timerInterval =
+setInterval(
+updateTimer,
+250
+);
+
+
+setStatus(
+"🔴 Gravando"
+);
+
+}
+
+
+
+/* =========================
+   TIMER
+========================= */
+
+function updateTimer(){
+
+
+let seconds =
+
+Math.floor(
+
+(
+Date.now()
+-
+recordingStart
+)
+/
+1000
+
+);
+
+
+let minutes =
+
+Math.floor(
+seconds / 60
+);
+
+
+seconds =
+seconds % 60;
+
+
+$("timer")
+.textContent =
+
+String(minutes)
+.padStart(
+2,
+"0"
+)
+
++
+":"
+
++
+
+String(seconds)
+.padStart(
+2,
+"0"
+);
+
+}
+
+
+
+/* =========================
+   PARAR
+========================= */
+
+function stopRecording(){
+
+
+if(
+recorder
+&&
+recording
+){
+
+recorder.stop();
+
+}
+
+
+recording = false;
+
+
+document.body
+.classList
+.remove(
+"recording"
+);
+
+
+$("recordText")
+.textContent =
+"REC";
+
+
+clearInterval(
+timerInterval
+);
+
+
+setStatus(
+"Processando vídeo..."
+);
+
+}
+
+
+
+/* =========================
+   SALVAR
+========================= */
+
+function saveRecording(){
+
+
+let type =
+recorder.mimeType
+||
+"video/webm";
+
+
+let blob =
+new Blob(
+recordedChunks,
+{
+type:type
+}
+);
+
+
+let url =
+URL.createObjectURL(
+blob
+);
+
+
+let link =
+document.createElement(
+"a"
+);
+
+
+link.href =
+url;
+
+
+link.download =
+
+"CINE_"
++
+new Date()
+.toISOString()
+.replace(
+/[:.]/g,
+"-"
+)
+
++
+
+"."
++
+
+(
+type.includes("mp4")
+?
+"mp4"
+:
+"webm"
+);
+
+
+link.click();
+
+
+setTimeout(
+function(){
+
+URL.revokeObjectURL(
+url
+);
+
+},
+3000
+);
+
+
+setStatus(
+"Vídeo salvo"
+);
+
+}
+
+
+
+/* =========================
+   INICIALIZAÇÃO
+========================= */
+
+updateCinema();
+
+</script>
+
+</body>
+
+</html>
