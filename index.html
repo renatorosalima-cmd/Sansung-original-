@@ -3,13 +3,14 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>ProCamera Web Prototype</title>
+    <title>Cine Manual</title>
     <style>
         * {
             box-sizing: border-box;
             margin: 0;
             padding: 0;
             user-select: none;
+            -webkit-user-select: none;
         }
         body {
             background-color: #000;
@@ -20,6 +21,7 @@
             display: flex;
             flex-direction: column;
         }
+
         /* Viewfinder / Câmera */
         .camera-container {
             position: relative;
@@ -34,7 +36,8 @@
             height: 100%;
             object-fit: cover;
         }
-        /* Overlay da Câmera (Grid / OSD) */
+
+        /* Grid da Regra dos Terços */
         .grid-overlay {
             position: absolute;
             top: 0;
@@ -45,11 +48,12 @@
             display: grid;
             grid-template-columns: 1fr 1fr 1fr;
             grid-template-rows: 1fr 1fr 1fr;
-            border: 1px solid rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.05);
         }
         .grid-box {
-            border: 0.5px solid rgba(255, 255, 255, 0.15);
+            border: 0.5px solid rgba(255, 255, 255, 0.12);
         }
+
         /* HUD Superior */
         .hud-top {
             position: absolute;
@@ -59,19 +63,27 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
-            background: rgba(0, 0, 0, 0.5);
-            padding: 8px 16px;
+            background: rgba(0, 0, 0, 0.6);
+            padding: 10px 18px;
             border-radius: 20px;
-            backdrop-filter: blur(8px);
-            font-size: 12px;
+            backdrop-filter: blur(10px);
+            font-size: 13px;
             font-weight: 600;
             letter-spacing: 1px;
+            z-index: 10;
+        }
+        .app-title {
+            color: #aaa;
+            font-weight: 700;
+            letter-spacing: 2px;
+            font-size: 11px;
         }
         .rec-indicator {
             display: flex;
             align-items: center;
-            gap: 6px;
+            gap: 8px;
             color: #ff3b30;
+            font-weight: bold;
         }
         .dot {
             width: 8px;
@@ -86,12 +98,12 @@
 
         /* Controles Manuais Inferiores */
         .controls-panel {
-            background: rgba(10, 10, 10, 0.9);
-            padding: 20px;
-            border-top: 1px solid #222;
+            background: #050505;
+            padding: 20px 24px 28px 24px;
+            border-top: 1px solid #1f1f1f;
             display: flex;
             flex-direction: column;
-            gap: 16px;
+            gap: 14px;
         }
         .control-group {
             display: flex;
@@ -101,29 +113,32 @@
         .control-label {
             display: flex;
             justify-content: space-between;
-            font-size: 13px;
-            color: #aaa;
+            font-size: 11px;
+            color: #888;
+            letter-spacing: 1.5px;
+            font-weight: 600;
         }
         .control-label span.val {
-            color: #00e5ff;
-            font-weight: bold;
+            color: #ffffff;
+            font-weight: 700;
         }
         input[type="range"] {
             -webkit-appearance: none;
             width: 100%;
-            height: 6px;
-            background: #333;
-            border-radius: 3px;
+            height: 4px;
+            background: #222;
+            border-radius: 2px;
             outline: none;
+            accent-color: #ffffff;
         }
         input[type="range"]::-webkit-slider-thumb {
             -webkit-appearance: none;
-            width: 20px;
-            height: 20px;
+            width: 18px;
+            height: 18px;
             border-radius: 50%;
-            background: #00e5ff;
+            background: #ffffff;
             cursor: pointer;
-            border: 2px solid #fff;
+            box-shadow: 0 0 8px rgba(0,0,0,0.5);
         }
 
         /* Botão de Gravação */
@@ -131,36 +146,41 @@
             display: flex;
             justify-content: center;
             align-items: center;
-            padding-top: 8px;
+            padding-top: 6px;
         }
         .record-btn {
             width: 64px;
             height: 64px;
             border-radius: 50%;
             background: transparent;
-            border: 4px solid #fff;
+            border: 3px solid #ffffff;
             display: flex;
             align-items: center;
             justify-content: center;
             cursor: pointer;
+            transition: border-color 0.2s ease;
         }
         .record-btn-inner {
-            width: 46px;
-            height: 46px;
+            width: 48px;
+            height: 48px;
             border-radius: 50%;
-            background: #ff3b30;
+            background: #ffffff;
             transition: all 0.2s ease;
         }
+        .record-btn.recording {
+            border-color: #ff3b30;
+        }
         .record-btn.recording .record-btn-inner {
-            border-radius: 8px;
-            width: 24px;
-            height: 24px;
+            border-radius: 6px;
+            width: 22px;
+            height: 22px;
+            background: #ff3b30;
         }
     </style>
 </head>
 <body>
 
-    <!-- Area da Camera -->
+    <!-- Area da Câmera -->
     <div class="camera-container">
         <video id="webcam" autoplay playsinline muted></video>
         
@@ -173,20 +193,20 @@
 
         <!-- HUD Superior -->
         <div class="hud-top">
+            <div class="app-title">CINE MANUAL</div>
             <div class="rec-indicator" id="recBadge" style="opacity: 0;">
-                <div class="dot"></div> REC
+                <div class="dot"></div> <span id="timerText">00:00</span>
             </div>
-            <div>4K UHD • 24 FPS</div>
-            <div id="statusText">MANUAL</div>
+            <div>4K • 24FPS</div>
         </div>
     </div>
 
-    <!-- Controles Manuais -->
+    <!-- Painel de Controles Manuais -->
     <div class="controls-panel">
         <!-- Controle ISO -->
         <div class="control-group">
             <div class="control-label">
-                <span>ISO (Sensibilidade)</span>
+                <span>ISO</span>
                 <span class="val" id="isoVal">100</span>
             </div>
             <input type="range" id="isoSlider" min="100" max="3200" step="100" value="100">
@@ -195,10 +215,19 @@
         <!-- Controle Shutter Speed -->
         <div class="control-group">
             <div class="control-label">
-                <span>Velocidade Obturador</span>
+                <span>OBTURADOR (SHUTTER)</span>
                 <span class="val" id="shutterVal">1/48 s</span>
             </div>
             <input type="range" id="shutterSlider" min="24" max="1000" step="1" value="48">
+        </div>
+
+        <!-- Controle de Foco -->
+        <div class="control-group">
+            <div class="control-label">
+                <span>FOCO MANUAL</span>
+                <span class="val" id="focusVal">50%</span>
+            </div>
+            <input type="range" id="focusSlider" min="0" max="100" step="1" value="50">
         </div>
 
         <!-- Botão de Ação -->
@@ -215,11 +244,18 @@
         const isoVal = document.getElementById('isoVal');
         const shutterSlider = document.getElementById('shutterSlider');
         const shutterVal = document.getElementById('shutterVal');
+        const focusSlider = document.getElementById('focusSlider');
+        const focusVal = document.getElementById('focusVal');
+        
         const recordBtn = document.getElementById('recordBtn');
         const recBadge = document.getElementById('recBadge');
+        const timerText = document.getElementById('timerText');
 
         let isRecording = false;
-        let videoTrack = null;
+        let mediaRecorder;
+        let recordedChunks = [];
+        let timerInterval;
+        let secondsElapsed = 0;
 
         // Iniciar Câmera
         async function initCamera() {
@@ -230,71 +266,81 @@
                         width: { ideal: 1920 },
                         height: { ideal: 1080 }
                     },
-                    audio: false
+                    audio: true
                 });
                 video.srcObject = stream;
-                videoTrack = stream.getVideoTracks()[0];
                 
-                // Tenta aplicar suporte manual nativo no navegador (onde suportado)
-                applyAdvancedCameraSettings();
+                // Configurar gravador de mídia
+                mediaRecorder = new MediaRecorder(stream);
+
+                mediaRecorder.ondataavailable = (event) => {
+                    if (event.data.size > 0) {
+                        recordedChunks.push(event.data);
+                    }
+                };
+
+                mediaRecorder.onstop = () => {
+                    const blob = new Blob(recordedChunks, { type: 'video/webm' });
+                    const url = URL.createObjectURL(blob);
+                    const a = document.createElement('a');
+                    a.style.display = 'none';
+                    a.href = url;
+                    a.download = `cinemanual_take_${Date.now()}.webm`;
+                    document.body.appendChild(a);
+                    a.click();
+                    setTimeout(() => {
+                        document.body.removeChild(a);
+                        window.URL.revokeObjectURL(url);
+                    }, 100);
+                    recordedChunks = [];
+                };
+
             } catch (err) {
-                console.error("Erro ao acessar a câmera: ", err);
-                alert("Não foi possível acessar a câmera. Verifique as permissões.");
+                console.error("Erro ao acessar câmera/microfone: ", err);
+                alert("Permissão de câmera e áudio necessária.");
             }
         }
 
-        // Tenta aplicar suporte aos controles de hardware (disponível em navegadores Android/Chrome)
-        async function applyAdvancedCameraSettings() {
-            if (!videoTrack) return;
-            const capabilities = videoTrack.getCapabilities ? videoTrack.getCapabilities() : {};
-            
-            // Verifica se a API do navegador dá suporte direto ao ISO
-            if (capabilities.iso) {
-                isoSlider.min = capabilities.iso.min;
-                isoSlider.max = capabilities.iso.max;
-                isoSlider.step = capabilities.iso.step;
-            }
+        // Timer de Gravação
+        function updateTimer() {
+            secondsElapsed++;
+            const mins = String(Math.floor(secondsElapsed / 60)).padStart(2, '0');
+            const secs = String(secondsElapsed % 60).padStart(2, '0');
+            timerText.textContent = `${mins}:${secs}`;
         }
 
-        // Atualizar ISO
-        isoSlider.addEventListener('input', (e) => {
-            const val = e.target.value;
-            isoVal.textContent = val;
-            
-            if (videoTrack && videoTrack.applyConstraints) {
-                videoTrack.applyConstraints({
-                    advanced: [{ iso: val }]
-                }).catch(() => {
-                    // Fallback visual via CSS se o navegador não permitir ajuste de hardware direto
-                    video.style.filter = `brightness(${val / 200})`
-                });
-            }
-        });
-
-        // Atualizar Shutter Speed
-        shutterSlider.addEventListener('input', (e) => {
-            const val = e.target.value;
-            shutterVal.textContent = `1/${val} s`;
-            
-            if (videoTrack && videoTrack.applyConstraints) {
-                // Converte fração em segundos (ex: 1/48)
-                const exposureTime = 1 / val; 
-                videoTrack.applyConstraints({
-                    advanced: [{ exposureTime: exposureTime }]
-                }).catch(() => {});
-            }
-        });
-
-        // Simular/Alternar Gravação
+        // Alternar Gravação
         recordBtn.addEventListener('click', () => {
+            if (!mediaRecorder) return;
+
             isRecording = !isRecording;
             if (isRecording) {
+                recordedChunks = [];
+                mediaRecorder.start();
                 recordBtn.classList.add('recording');
                 recBadge.style.opacity = '1';
+                secondsElapsed = 0;
+                timerText.textContent = "00:00";
+                timerInterval = setInterval(updateTimer, 1000);
             } else {
+                mediaRecorder.stop();
                 recordBtn.classList.remove('recording');
                 recBadge.style.opacity = '0';
+                clearInterval(timerInterval);
             }
+        });
+
+        // Sliders de Ajuste
+        isoSlider.addEventListener('input', (e) => {
+            isoVal.textContent = e.target.value;
+        });
+
+        shutterSlider.addEventListener('input', (e) => {
+            shutterVal.textContent = `1/${e.target.value} s`;
+        });
+
+        focusSlider.addEventListener('input', (e) => {
+            focusVal.textContent = `${e.target.value}%`;
         });
 
         // Inicializar
